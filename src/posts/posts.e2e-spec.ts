@@ -37,8 +37,7 @@ describe('Posts (e2e)', () => {
     };
 
     const post: Partial<Post> = {
-      imageUrl: faker.random.uuid(),
-      likes: []
+      imageUrl: faker.random.uuid()
     };
 
     let accessToken;
@@ -56,6 +55,7 @@ describe('Posts (e2e)', () => {
         .expect(({ body }) => {
           expect(body.id).toBeTruthy();
           expect(body).toMatchObject(post);
+          expect(body.likes).toStrictEqual([]);
         });
     });
   });

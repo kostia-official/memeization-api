@@ -17,7 +17,7 @@ export class Post {
   @Column()
   imageUrl: string;
 
-  @Column('simple-array')
+  @Column({ type: 'simple-array', default: '' })
   likes: string[];
 
   @ManyToOne(() => User)
