@@ -8,11 +8,12 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/users.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from './posts.entity';
+import { AuthService } from '../auth/auth.service';
 
 describe('Posts (e2e)', () => {
   let app: INestApplication;
   let postsService: PostsService;
-  let usersService: UsersService;
+  let authService: AuthService;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -24,7 +25,7 @@ describe('Posts (e2e)', () => {
     await app.init();
 
     postsService = moduleFixture.get<PostsService>(PostsService);
-    usersService = moduleFixture.get<UsersService>(UsersService);
+    authService = moduleFixture.get<AuthService>(AuthService);
   });
 
   describe('POST /posts', () => {
@@ -37,18 +38,20 @@ describe('Posts (e2e)', () => {
 
     const post: Partial<Post> = {
       imageUrl: faker.random.uuid(),
-      likes: [],
-      userId: user.id,
+      likes: []
     };
 
-    beforeAll(() => {
-      return usersService.create(user);
+    let accessToken;
+    beforeAll(async() => {
+      const result = await authService.signUp(user);
+      accessToken = result.accessToken;
     });
 
     it('should create a post', () => {
       return request(app.getHttpServer())
         .post('/posts')
         .send(post)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(201)
         .expect(({ body }) => {
           expect(body.id).toBeTruthy();
@@ -56,26 +59,4 @@ describe('Posts (e2e)', () => {
         });
     });
   });
-
-  // describe('GET /users/:id', () => {
-  //   const user: UserCreateInput = {
-  //     id: faker.random.uuid(),
-  //     name: faker.internet.userName(),
-  //     email: faker.internet.email(),
-  //     password: faker.random.uuid(),
-  //   };
-  //
-  //   beforeAll(() => {
-  //     return postsService.create(user);
-  //   });
-  //
-  //   it('should create a user', () => {
-  //     return request(app.getHttpServer())
-  //       .get(`/users/${user.id}`)
-  //       .expect(200)
-  //       .expect(req => {
-  //         expect(req.body).toMatchObject(user);
-  //       });
-  //   });
-  // });
 });
