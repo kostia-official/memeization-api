@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { config } from './config/config';
+import { config } from './common/config';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
